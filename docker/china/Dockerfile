@@ -48,8 +48,10 @@ RUN /bin/bash -c "pip3 install modelscope && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
 # Copy the monitor script and start script to the container
-COPY monitor_script.sh /monitor_script.sh
-COPY start.sh /start.sh
+RUN /bin/bash -c "wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.sh -O monitor_script.sh && \
+    wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/start.sh -O start.sh && \
+    chmod +x /monitor_script.sh /start.sh"
+
 RUN chmod +x /monitor_script.sh /start.sh
 
 # Add debugging information
