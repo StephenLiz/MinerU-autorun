@@ -19,6 +19,7 @@ RUN apt-get update && \
         git \
         libgl1 \
         libglib2.0-0 \
+        inotify-tools \
         && rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.10 as the default python3
@@ -46,5 +47,14 @@ RUN /bin/bash -c "pip3 install modelscope && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
-# Set the entry point to activate the virtual environment and run the command line tool
-ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec \"$@\"", "--"]
+# Copy the monitor script and start script to the container
+COPY monitor_script.sh /monitor_script.sh
+COPY start.sh /start.sh
+RUN chmod +x /monitor_script.sh /start.sh
+
+# Add debugging information
+RUN ls -l /start.sh
+RUN cat /start.sh
+
+# Set the entry point to run the start script
+ENTRYPOINT ["/start.sh"]
