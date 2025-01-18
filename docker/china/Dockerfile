@@ -1,4 +1,3 @@
-# Use the official Ubuntu base image
 FROM ubuntu:22.04
 
 # Set environment variables to non-interactive to avoid prompts during installation
@@ -19,7 +18,6 @@ RUN apt-get update && \
         git \
         libgl1 \
         libglib2.0-0 \
-        inotify-tools \
         && rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.10 as the default python3
@@ -47,16 +45,9 @@ RUN /bin/bash -c "pip3 install modelscope && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
-# Copy the monitor script and start script to the container
-RUN /bin/bash -c "wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.sh -O monitor_script.sh && \
-    wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/start.sh -O start.sh && \
-    chmod +x /monitor_script.sh /start.sh"
+# Download the monitor script
+RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.sh -O /monitor_script.sh
+RUN chmod +x /monitor_script.sh
 
-RUN chmod +x /monitor_script.sh /start.sh
-
-# Add debugging information
-RUN ls -l /start.sh
-RUN cat /start.sh
-
-# Set the entry point to run the start script
-ENTRYPOINT ["/start.sh"]
+# Set the entry point to run the monitor script
+ENTRYPOINT ["/monitor_script.sh"]
