@@ -8,9 +8,6 @@ OUTPUT_DIR="/output"
 # 激活虚拟环境
 source /opt/mineru_venv/bin/activate
 
-# 安装inotify-tools
-apt-get update && apt-get install -y inotify-tools
-
 # 打印调试信息
 echo "Debugging information:"
 echo "Python version: $(python3 --version)"

@@ -18,6 +18,7 @@ RUN apt-get update && \
         git \
         libgl1 \
         libglib2.0-0 \
+        inotify-tools \
         && rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.10 as the default python3
