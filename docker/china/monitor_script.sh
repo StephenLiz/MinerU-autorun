@@ -23,8 +23,10 @@ do
 
     if [[ -f "$FILE" && "$FILE" == *.pdf && $(stat -c%s "$FILE") -gt 0 ]]; then
         echo "New PDF detected: $FILE"
+        # 打印调用magic-pdf的指令
+        echo "Calling magic-pdf with command: magic-pdf -p \"$FILE\" -o \"$OUTPUT_DIR\""
         # 调用magic-pdf处理PDF并生成Markdown格式文档
-        magic-pdf --path "$FILE" --output-dir "$OUTPUT_DIR"
+        magic-pdf -p "$FILE" -o "$OUTPUT_DIR"
         # 处理完成后删除已处理的PDF文档
         rm "$FILE"
     else

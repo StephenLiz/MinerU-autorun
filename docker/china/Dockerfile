@@ -46,9 +46,11 @@ RUN /bin/bash -c "pip3 install modelscope && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
-# Download the monitor script
-RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.sh -O /monitor_script.sh
-RUN chmod +x /monitor_script.sh
+# Install dependencies for monitor_script.py
+RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && pip3 install watchdog"
 
-# Ensure the virtual environment is activated and the PATH includes the virtual environment's bin directory
-ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec /monitor_script.sh"]
+# Download the monitor script
+RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py
+
+# Set the entry point to run the monitor script
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec python3 /monitor_script.py"]
