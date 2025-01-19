@@ -1,11 +1,14 @@
 import os
 import time
+import shutil
 import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # 监视目录
 WATCH_DIR = "/input"
+# 缓存目录
+CACHE_DIR = "/cache"
 # 输出目录
 OUTPUT_DIR = "/output"
 
@@ -20,6 +23,13 @@ print(f"Pip version: {subprocess.check_output(['pip3', '--version']).decode().st
 print(f"Magic-pdf path: {subprocess.check_output(['which', 'magic-pdf']).decode().strip()}")
 print(f"inotifywait path: {subprocess.check_output(['which', 'inotifywait']).decode().strip()}")
 
+# 确保缓存目录存在
+if not os.path.exists(CACHE_DIR):
+    os.makedirs(CACHE_DIR)
+
+# 待处理文件队列
+file_queue = []
+
 class PDFHandler(FileSystemEventHandler):
     def on_closed(self, event):
         if not event.is_directory and event.src_path.endswith('.pdf'):
@@ -28,20 +38,47 @@ class PDFHandler(FileSystemEventHandler):
             time.sleep(10)
             if os.path.isfile(file_path) and os.path.getsize(file_path) > 0:
                 print(f"New PDF detected: {file_path}")
-                # 调用magic-pdf处理PDF并生成Markdown格式文档
-                cmd = f"magic-pdf -p \"{file_path}\" -o \"{OUTPUT_DIR}\""
-                print(f"Calling magic-pdf with command: {cmd}")
-                subprocess.run(cmd, shell=True, check=True)
-                # 处理完成后删除已处理的PDF文档
-                os.remove(file_path)
+                file_queue.append(file_path)
             else:
                 print(f"File not valid or not a PDF: {file_path}")
+
+def process_files():
+    while True:
+        if file_queue:
+            file_path = file_queue.pop(0)
+            try:
+                # 移动文件到缓存目录
+                cache_file_path = os.path.join(CACHE_DIR, os.path.basename(file_path))
+                shutil.move(file_path, cache_file_path)
+                print(f"Moved {file_path} to {cache_file_path}")
+
+                # 调用 magic-pdf 处理 PDF 并生成 Markdown 格式文档
+                cmd = f"magic-pdf -p \"{cache_file_path}\" -o \"{OUTPUT_DIR}\""
+                print(f"Calling magic-pdf with command: {cmd}")
+                subprocess.run(cmd, shell=True, check=True)
+
+                # 清空缓存目录
+                for root, dirs, files in os.walk(CACHE_DIR):
+                    for file in files:
+                        os.remove(os.path.join(root, file))
+                print(f"Cleared cache directory: {CACHE_DIR}")
+            except Exception as e:
+                print(f"Error processing file {file_path}: {e}")
+        else:
+            time.sleep(1)
 
 if __name__ == "__main__":
     event_handler = PDFHandler()
     observer = Observer()
     observer.schedule(event_handler, WATCH_DIR, recursive=False)
     observer.start()
+
+    # 启动文件处理线程
+    import threading
+    process_thread = threading.Thread(target=process_files)
+    process_thread.daemon = True
+    process_thread.start()
+
     try:
         while True:
             time.sleep(1)
