@@ -19,6 +19,7 @@ RUN apt-get update && \
         libgl1 \
         libglib2.0-0 \
         inotify-tools \
+        vim \
         && rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.10 as the default python3
@@ -53,4 +54,4 @@ RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && pip3 install watchdog"
 RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py
 
 # Set the entry point to run the monitor script
-ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec python3 /monitor_script.py"]
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec python3 -u /monitor_script.py"]
