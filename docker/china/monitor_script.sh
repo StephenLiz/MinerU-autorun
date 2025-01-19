@@ -24,7 +24,7 @@ do
     if [[ -f "$FILE" && "$FILE" == *.pdf && $(stat -c%s "$FILE") -gt 0 ]]; then
         echo "New PDF detected: $FILE"
         # 调用magic-pdf处理PDF并生成Markdown格式文档
-        magic-pdf --input "$FILE" --output "$OUTPUT_DIR" --config /root/magic-pdf.json
+        magic-pdf --path "$FILE" --output-dir "$OUTPUT_DIR" --config /root/magic-pdf.json
         # 处理完成后删除已处理的PDF文档
         rm "$FILE"
     else

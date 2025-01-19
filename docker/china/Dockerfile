@@ -50,5 +50,5 @@ RUN /bin/bash -c "pip3 install modelscope && \
 RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.sh -O /monitor_script.sh
 RUN chmod +x /monitor_script.sh
 
-# Set the entry point to run the monitor script
-ENTRYPOINT ["/monitor_script.sh"]
+# Ensure the virtual environment is activated and the PATH includes the virtual environment's bin directory
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec /monitor_script.sh"]
