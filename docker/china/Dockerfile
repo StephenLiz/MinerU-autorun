@@ -32,7 +32,9 @@ RUN python3 -m venv /opt/mineru_venv
 RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && \
     pip3 install --upgrade pip -i https://mirrors.aliyun.com/pypi/simple && \
     wget https://gcore.jsdelivr.net/gh/opendatalab/MinerU@master/docker/china/requirements.txt -O requirements.txt && \
+    wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py && \
     pip3 install -r requirements.txt --extra-index-url https://wheels.myhloli.com -i https://mirrors.aliyun.com/pypi/simple && \
+    pip3 install watchdog && \
     pip3 install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/"
 
 # Copy the configuration file template and install magic-pdf latest
@@ -46,12 +48,6 @@ RUN /bin/bash -c "pip3 install modelscope && \
     wget https://gcore.jsdelivr.net/gh/opendatalab/MinerU@master/scripts/download_models.py -O download_models.py && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
-
-# Install dependencies for monitor_script.py
-RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && pip3 install watchdog"
-
-# Download the monitor script
-RUN wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py
 
 # Set the entry point to run the monitor script
 ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec python3 /monitor_script.py"]
