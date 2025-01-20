@@ -3,6 +3,7 @@ import time
 import subprocess
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
+import shutil
 
 # 监视目录
 WATCH_DIR = "/input"
@@ -41,7 +42,7 @@ class PDFHandler(FileSystemEventHandler):
                 src_file = os.path.join(WATCH_DIR, file_name)
                 dest_file = os.path.join(CACHE_DIR, file_name)
                 # 移动文件
-                os.rename(src_file, dest_file)
+                shutil.move(src_file, dest_file)
                 print(f"{file_name} 已从 {WATCH_DIR} 移动到 {CACHE_DIR}")
 
 if __name__ == "__main__":
