@@ -42,9 +42,11 @@ class MyHandler(FileSystemEventHandler):
                 if event.src_path.startswith(INPUT_DIR):
                     print(f"INPUT_DIR有名为{filename}的新文件产生")
                     self.input_dir_empty = False
+                    self.handle_new_file_input(filename)  # 调用处理函数
                 elif event.src_path.startswith(CACHE_DIR):
                     print(f"CACHE_DIR有名为{filename}的新文件产生")
                     self.cache_dir_empty = False
+                    self.handle_new_file_cache(filename)  # 调用处理函数
 
                 # 只有成功检测到有效文件时，重置上一个空文件信息
                 self.last_empty_message = False
@@ -54,6 +56,13 @@ class MyHandler(FileSystemEventHandler):
             print("INPUT_DIR及CACHE_DIR均无文件")
             self.last_empty_message = True  # 设置标志位，防止重复打印
 
+    def handle_new_file_input(self, filename):
+        # 处理 INPUT_DIR 中的文件
+        print(f"处理INPUT_DIR中的文件: {filename}")
+
+    def handle_new_file_cache(self, filename):
+        # 处理 CACHE_DIR 中的文件
+        print(f"处理CACHE_DIR中的文件: {filename}")
 
 def clear_directory(directory):
     for filename in os.listdir(directory):
@@ -61,7 +70,6 @@ def clear_directory(directory):
             file_path = os.path.join(directory, filename)
             os.remove(file_path)
             print(f"已删除文件: {file_path}")
-
 
 if __name__ == "__main__":
     # 清空输入和缓存目录中的所有MinerU支持的文件
