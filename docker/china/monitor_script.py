@@ -61,7 +61,7 @@ def process_files():
 
     # 执行文件转换
     output_path = OUTPUT_DIR  # 假设输出目录为 OUTPUT_DIR
-    magic_pdf_command = f"magic-pdf -p {dst_path} -o {output_path}"
+    magic_pdf_command = f"magic-pdf -p '{dst_path}' -o '{output_path}'"
     print(f"执行命令: {magic_pdf_command}")
     subprocess.run(magic_pdf_command, shell=True)
 
