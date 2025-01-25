@@ -4,11 +4,11 @@ import subprocess
 import shutil
 
 # 输入目录
-INPUT_DIR = "/home/gwongzaak/SMBservice/input"
+INPUT_DIR = "/input"
 # 输出目录
-OUTPUT_DIR = "/home/gwongzaak/SMBservice/output"
+OUTPUT_DIR = "/output"
 # 缓存目录
-CACHE_DIR = "/home/gwongzaak/SMBservice/cache"
+CACHE_DIR = "/cache"
 
 # 激活虚拟环境
 venv_activate = "/opt/mineru_venv/bin/activate"
