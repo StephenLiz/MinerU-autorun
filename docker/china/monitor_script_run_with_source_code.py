@@ -21,6 +21,7 @@ print(f"Pip version: {subprocess.check_output(['pip3', '--version']).decode().st
 print(f"Magic-pdf path: {subprocess.check_output(['which', 'magic-pdf']).decode().strip()}")
 print(f"inotifywait path: {subprocess.check_output(['which', 'inotifywait']).decode().strip()}")
 
+
 # 定义支持的文件格式
 SUPPORTED_FILE_FORMATS = {'.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx', '.ppt', '.pptx'}
 
