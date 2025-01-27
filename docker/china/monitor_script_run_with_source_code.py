@@ -76,6 +76,16 @@ def process_files():
     except subprocess.CalledProcessError as e:
         print(f"命令执行失败: {e}")
 
+    # 改变 OUTPUT_DIR 的权限，让所有用户有权限删除 OUTPUT_DIR 及其子目录中的所有文件
+    chmod_command = f"chmod -R 777 '{output_path}'"
+    print(f"执行命令: {chmod_command}")
+
+    try:
+        subprocess.run(chmod_command, shell=True, check=True)
+        print(f"已成功更改 {output_path} 的权限。")
+    except subprocess.CalledProcessError as e:
+        print(f"更改权限失败: {e}")
+
     # 删除缓存文件
     try:
         os.remove(dst_path)
