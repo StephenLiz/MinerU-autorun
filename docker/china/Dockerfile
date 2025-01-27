@@ -1,5 +1,4 @@
-# Use the official Ubuntu base image
-# https://github.com/opendatalab/MinerU/blob/master/docker/china/Dockerfile
+# Dockerfile
 FROM ubuntu:22.04
 
 # Set environment variables to non-interactive to avoid prompts during installation
@@ -37,8 +36,6 @@ RUN /bin/bash -c "source /opt/mineru_venv/bin/activate && \
     pip3 install -r requirements.txt --extra-index-url https://wheels.myhloli.com -i https://mirrors.aliyun.com/pypi/simple && \
     pip3 install paddlepaddle-gpu==3.0.0b1 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/"
 
-
-
 # Copy the configuration file template and install magic-pdf latest
 RUN /bin/bash -c "wget https://gcore.jsdelivr.net/gh/opendatalab/MinerU@master/magic-pdf.template.json && \
     cp magic-pdf.template.json /root/magic-pdf.json && \
@@ -51,9 +48,11 @@ RUN /bin/bash -c "pip3 install modelscope && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
-# Download monitor_script.py from project and set a cache ditrctory
+# Download monitor_script.py from project and set a cache directory
 RUN /bin/bash -c "wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py && \
     mkdir /cache"
 
+# Create the output directory
+RUN mkdir -p /output
 # Set the entry point to run the monitor script
 ENTRYPOINT ["/bin/bash", "-c", "source /opt/mineru_venv/bin/activate && exec python3 /monitor_script.py"]
