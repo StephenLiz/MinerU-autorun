@@ -42,10 +42,23 @@ def clear_supported_files(directory):
     print(f"已清空{directory}中符合格式的文件.")
 
 
+def wait_for_file_stable(file_path):
+    """等待文件大小稳定"""
+    last_size = -1
+    while True:
+        current_size = os.path.getsize(file_path)
+        if current_size == last_size:
+            break
+        last_size = current_size
+        time.sleep(4)
+    print(f"文件 {file_path} 大小稳定。")
+
+
 def process_files():
     """处理文件，移动至缓存并执行转换"""
-    # 获取符合支持格式的文件列表
-    input_files = [f for f in os.listdir(INPUT_DIR) if os.path.splitext(f)[1].lower() in SUPPORTED_FILE_FORMATS]
+    # 获取符合支持格式的文件列表，并忽略以 "._" 开头的文件
+    input_files = [f for f in os.listdir(INPUT_DIR)
+                   if os.path.splitext(f)[1].lower() in SUPPORTED_FILE_FORMATS and not f.startswith("._")]
 
     if not input_files:
         print("INPUT_DIR 中没有符合格式的文件，稍后再试。")
@@ -56,8 +69,11 @@ def process_files():
     oldest_file = input_files[0]
     print(f"最旧的文件是: {oldest_file}")
 
-    # 移动文件到缓存目录
+    # 等待文件大小稳定
     src_path = os.path.join(INPUT_DIR, oldest_file)
+    wait_for_file_stable(src_path)
+
+    # 移动文件到缓存目录
     dst_path = os.path.join(CACHE_DIR, oldest_file)
     try:
         shutil.move(src_path, dst_path)
@@ -65,6 +81,9 @@ def process_files():
     except (OSError, shutil.Error) as e:
         print(f"移动文件 {oldest_file} 失败: {e}")
         return
+
+    # 等待移动后的文件大小稳定
+    wait_for_file_stable(dst_path)
 
     # 执行文件转换
     output_path = OUTPUT_DIR  # 假设输出目录为 OUTPUT_DIR
@@ -128,3 +147,4 @@ clear_supported_files(CACHE_DIR)
 
 # 开始监控文件状态
 monitor_file_status()
+
