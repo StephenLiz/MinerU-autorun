@@ -48,6 +48,9 @@ RUN /bin/bash -c "pip3 install modelscope && \
     python3 download_models.py && \
     sed -i 's|cpu|cuda|g' /root/magic-pdf.json"
 
+# require in page https://github.com/opendatalab/MinerU/issues/1457
+RUN /bin/bash -c "pip3 install rapid-table==0.3.0"
+
 # Download monitor_script.py from project and set a cache directory
 RUN /bin/bash -c "wget https://gcore.jsdelivr.net/gh/StephenLiz/MinerU-autorun@master/docker/china/monitor_script.py -O /monitor_script.py && \
     mkdir /cache"

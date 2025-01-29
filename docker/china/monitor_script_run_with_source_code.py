@@ -58,6 +58,7 @@ def wait_for_file_stable(file_path, timeout=60):
     """等待文件大小稳定，并结合文件锁检测"""
     start_time = time.time()
     last_size = -1
+    time.sleep(6)
     while time.time() - start_time < timeout:
         current_size = os.path.getsize(file_path)
         if current_size == last_size and not is_file_locked(file_path):
