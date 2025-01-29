@@ -2,6 +2,7 @@ import os
 import time
 import subprocess
 import shutil
+import psutil
 
 # 输入目录
 INPUT_DIR = "/input"
@@ -41,16 +42,36 @@ def clear_supported_files(directory):
     print(f"已清空{directory}中符合格式的文件.")
 
 
-def wait_for_file_stable(file_path):
-    """等待文件大小稳定"""
+def is_file_locked(file_path):
+    """检查文件是否被锁定"""
+    for proc in psutil.process_iter(['pid', 'open_files']):
+        try:
+            open_files = proc.info['open_files']
+            if open_files and any(file_path == f.path for f in open_files):
+                return True
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+    return False
+
+
+def wait_for_file_stable(file_path, timeout=60):
+    """等待文件大小稳定，并结合文件锁检测"""
+    start_time = time.time()
     last_size = -1
-    while True:
+    while time.time() - start_time < timeout:
         current_size = os.path.getsize(file_path)
-        if current_size == last_size:
+        if current_size == last_size and not is_file_locked(file_path):
             break
         last_size = current_size
-        time.sleep(4)
+
+        # 每50MB增加1秒间隔
+        check_interval = max(1, last_size // (50 * 1024 * 1024))
+        time.sleep(check_interval)
+    else:
+        print(f"文件 {file_path} 在 {timeout} 秒内未稳定。")
+        return False
     print(f"文件 {file_path} 大小稳定。")
+    return True
 
 
 def process_files():
@@ -70,7 +91,8 @@ def process_files():
 
     # 等待文件大小稳定
     src_path = os.path.join(INPUT_DIR, oldest_file)
-    wait_for_file_stable(src_path)
+    if not wait_for_file_stable(src_path):
+        return
 
     # 移动文件到缓存目录
     dst_path = os.path.join(CACHE_DIR, oldest_file)
@@ -82,7 +104,8 @@ def process_files():
         return
 
     # 等待移动后的文件大小稳定
-    wait_for_file_stable(dst_path)
+    if not wait_for_file_stable(dst_path):
+        return
 
     # 执行文件转换
     output_path = OUTPUT_DIR  # 假设输出目录为 OUTPUT_DIR
